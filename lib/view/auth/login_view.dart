@@ -1,15 +1,14 @@
 import 'package:e_commerce/core/view_model/auth_view_model.dart';
-import 'package:e_commerce/view/constance.dart';
-import 'package:e_commerce/view/widgets/custom_button.dart';
-import 'package:e_commerce/view/widgets/custom_button_social.dart';
-import 'package:e_commerce/view/widgets/custom_text.dart';
-import 'package:e_commerce/view/widgets/custom_text_form_field.dart';
+import 'package:e_commerce/constance.dart';
+import 'package:e_commerce/view/auth/register_view.dart';
+import 'package:e_commerce/view/widgets/custom_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class LoginScreen extends GetWidget<AuthViewModel> {
-  bool password = true;
+class LoginView extends GetWidget<AuthViewModel> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,6 +23,8 @@ class LoginScreen extends GetWidget<AuthViewModel> {
           left: 20,
         ),
         child: SingleChildScrollView(
+            child: Form(
+          key: _formKey,
           child: Column(
             children: [
               Row(
@@ -33,10 +34,15 @@ class LoginScreen extends GetWidget<AuthViewModel> {
                     text: 'Welcome',
                     fontSize: 30,
                   ),
-                  CustomText(
-                    text: 'Sign Up',
-                    color: primaryColor,
-                    fontSize: 18,
+                  GestureDetector(
+                    onTap: () {
+                      Get.to(RegisterView());
+                    },
+                    child: CustomText(
+                      text: 'Sign Up',
+                      color: primaryColor,
+                      fontSize: 18,
+                    ),
                   ),
                 ],
               ),
@@ -56,27 +62,29 @@ class LoginScreen extends GetWidget<AuthViewModel> {
                 text: 'Email',
                 hint: 'example@gmail.com',
                 keybourdType: TextInputType.emailAddress,
-                onSave: (value) {},
-                validator: (value) {},
+                onSave: (value) {
+                  controller.email = value;
+                },
+                validator: (value) {
+                  if (value == null) {
+                    print('Error');
+                  }
+                },
               ),
               SizedBox(height: 40),
               CustomTextFormField(
                 text: 'Password',
                 hint: '*********',
                 keybourdType: TextInputType.visiblePassword,
-                obscureText: password,
-                /* icon: IconButton(
-                  icon: password
-                      ? Icon(Icons.visibility_off)
-                      : Icon(Icons.visibility),
-                  onPressed: () {
-                    setState(() {
-                      password = !password;
-                    });
-                  },
-                ),*/
-                onSave: (value) {},
-                validator: (value) {},
+                obscureText: true,
+                onSave: (value) {
+                  controller.password = value;
+                },
+                validator: (value) {
+                  if (value == null) {
+                    print('Error');
+                  }
+                },
               ),
               SizedBox(
                 height: 20,
@@ -92,7 +100,12 @@ class LoginScreen extends GetWidget<AuthViewModel> {
               CustomButton(
                 color: primaryColor,
                 text: 'SIGN IN',
-                onPressed: () {},
+                onPressed: () {
+                  _formKey.currentState!.save();
+                  if (_formKey.currentState!.validate()) {
+                    controller.signInWithEmailAndPassword();
+                  }
+                },
               ),
               SizedBox(
                 height: 20,
@@ -107,7 +120,7 @@ class LoginScreen extends GetWidget<AuthViewModel> {
               ),
               CustomButtonSocial(
                   onpressed: () {
-                    controller.FacebookSignInMethod();
+                    controller.facebookSignInMethod();
                   },
                   image: 'assets/images/facebook.png',
                   text: 'Sign In with Facebook'),
@@ -117,13 +130,14 @@ class LoginScreen extends GetWidget<AuthViewModel> {
               CustomButtonSocial(
                 image: 'assets/images/google.jpg',
                 text: 'Sign In with Google',
-                onpressed: () {controller.GoogleSignInMethod();},
+                onpressed: () {
+                  controller.googleSignInMethod();
+                },
               ),
             ],
           ),
-        ),
+        )),
       ),
     );
   }
 }
-
